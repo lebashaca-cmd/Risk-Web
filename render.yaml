@@ -3,10 +3,15 @@ services:
     name: risk-site
     runtime: python
     plan: free
+<<<<<<< HEAD
     buildCommand: pip install -r requirements.txt
     startCommand: python server.py
     healthCheckPath: /healthz
     autoDeploy: true
+=======
+    buildCommand: npm install && pip install -r requirements.txt && npm run build
+    startCommand: node web/assets/js/home.js
+>>>>>>> b95c640526195c1ddfe7ba9de24b6ea0c8ab99c8
     envVars:
       - key: BOT_STATUS_URL
         value: https://uison65lds.apps.bot-hosting.cloud/status
