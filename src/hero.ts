@@ -19,8 +19,8 @@ function embed(bar: string, title: string, description: string | null, fields: [
       ? h(
           "div",
           { class: "embed-fields" },
-          ...fields.map(([name, value]) =>
-            h("div", { class: "embed-field" }, h("div", { class: "embed-field-name" }, name), h("div", {}, value)),
+          ...fields.map(([name, value], i) =>
+            h("div", { class: "embed-field", style: `--f:${i}` }, h("div", { class: "embed-field-name" }, name), h("div", {}, value)),
           ),
         )
       : null,
@@ -176,6 +176,29 @@ export function mountHero(root: HTMLElement): () => void {
     void play(index);
   }
 
+  const canTilt = !reduceMotion && window.matchMedia("(hover: hover)").matches;
+  let frame = 0;
+  const clamp = (value: number) => Math.max(-0.5, Math.min(0.5, value));
+  const onMove = (event: PointerEvent) => {
+    if (frame) return;
+    frame = requestAnimationFrame(() => {
+      frame = 0;
+      const box = panel.getBoundingClientRect();
+      const px = clamp((event.clientX - box.left) / box.width - 0.5);
+      const py = clamp((event.clientY - box.top) / box.height - 0.5);
+      panel.style.setProperty("--rx", `${(-py * 5).toFixed(2)}deg`);
+      panel.style.setProperty("--ry", `${(px * 7).toFixed(2)}deg`);
+    });
+  };
+  const onLeave = () => {
+    panel.style.setProperty("--rx", "0deg");
+    panel.style.setProperty("--ry", "0deg");
+  };
+  if (canTilt) {
+    root.addEventListener("pointermove", onMove);
+    root.addEventListener("pointerleave", onLeave);
+  }
+
   root.replaceChildren(
     h("div", { class: "tabs", role: "tablist", "aria-label": "Example commands" }, ...tabs),
     panel,
@@ -185,5 +208,7 @@ export function mountHero(root: HTMLElement): () => void {
 
   return () => {
     run += 1;
+    root.removeEventListener("pointermove", onMove);
+    root.removeEventListener("pointerleave", onLeave);
   };
 }

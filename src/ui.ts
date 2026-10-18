@@ -35,3 +35,8 @@ export async function copyText(text: string): Promise<boolean> {
 export async function copyWithToast(text: string): Promise<void> {
   toast((await copyText(text)) ? "Copied to clipboard" : "Couldn't copy. Select the text and copy it yourself.");
 }
+
+export function flashCopied(button: HTMLElement): void {
+  button.classList.add("copied");
+  window.setTimeout(() => button.classList.remove("copied"), 1100);
+}

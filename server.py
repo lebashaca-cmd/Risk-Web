@@ -52,7 +52,7 @@ def env(name, default=""):
 
 class Settings:
     def __init__(self):
-        self.port = int(env("PORT") or env("SERVER_PORT") or 1000)
+        self.port = int(env("PORT") or env("SERVER_PORT") or 8080)
         self.name = env("SITE_NAME", "Risk")
         self.status_url = env("BOT_STATUS_URL")
         self.client_id = env("CLIENT_ID")

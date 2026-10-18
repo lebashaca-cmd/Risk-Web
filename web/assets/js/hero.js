@@ -2,7 +2,7 @@ import { h } from "./dom.js";
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 function embed(bar, title, description, fields, footer) {
     return h("div", { class: `embed bar-${bar}` }, h("div", { class: "embed-title" }, title), description ? h("div", { class: "embed-desc" }, description) : null, fields.length
-        ? h("div", { class: "embed-fields" }, ...fields.map(([name, value]) => h("div", { class: "embed-field" }, h("div", { class: "embed-field-name" }, name), h("div", {}, value))))
+        ? h("div", { class: "embed-fields" }, ...fields.map(([name, value], i) => h("div", { class: "embed-field", style: `--f:${i}` }, h("div", { class: "embed-field-name" }, name), h("div", {}, value))))
         : null, footer ? h("div", { class: "embed-footer" }, footer) : null);
 }
 const SCENARIOS = [
@@ -121,9 +121,34 @@ export function mountHero(root) {
             panel.setAttribute("aria-labelledby", `tab-${scenario.id}`);
         void play(index);
     }
+    const canTilt = !reduceMotion && window.matchMedia("(hover: hover)").matches;
+    let frame = 0;
+    const clamp = (value) => Math.max(-0.5, Math.min(0.5, value));
+    const onMove = (event) => {
+        if (frame)
+            return;
+        frame = requestAnimationFrame(() => {
+            frame = 0;
+            const box = panel.getBoundingClientRect();
+            const px = clamp((event.clientX - box.left) / box.width - 0.5);
+            const py = clamp((event.clientY - box.top) / box.height - 0.5);
+            panel.style.setProperty("--rx", `${(-py * 5).toFixed(2)}deg`);
+            panel.style.setProperty("--ry", `${(px * 7).toFixed(2)}deg`);
+        });
+    };
+    const onLeave = () => {
+        panel.style.setProperty("--rx", "0deg");
+        panel.style.setProperty("--ry", "0deg");
+    };
+    if (canTilt) {
+        root.addEventListener("pointermove", onMove);
+        root.addEventListener("pointerleave", onLeave);
+    }
     root.replaceChildren(h("div", { class: "tabs", role: "tablist", "aria-label": "Example commands" }, ...tabs), panel, h("p", { class: "chat-note" }, "Example output. Your server shows real results."));
     select(active);
     return () => {
         run += 1;
+        root.removeEventListener("pointermove", onMove);
+        root.removeEventListener("pointerleave", onLeave);
     };
 }

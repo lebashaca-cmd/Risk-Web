@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Risk: tickets, logs and moderation for Discord</title>
+  <meta name="description" content="Risk is a Discord bot for ticket channels, server logs, welcome messages, AI answers and TikTok, YouTube, GitHub and Spotify lookups.">
+  <meta name="color-scheme" content="light dark">
+  <meta property="og:title" content="Risk: tickets, logs and moderation for Discord">
+  <meta property="og:description" content="Ticket channels, server logs, welcome messages, AI answers and social lookups in one Discord bot.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+  <a class="skip" href="#app">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="wordmark" href="/" data-link aria-label="Risk home">risk</a>
+      <nav aria-label="Main">
+        <a href="/commands" data-link>Commands</a>
+        <a href="/terms" data-link>Terms</a>
+      </nav>
+      <div class="header-end">
+        <span class="status-mini" role="status">
+          <span class="status-dot" data-status-dot data-state="checking"></span>
+          <span data-status-label>Checking status</span>
+        </span>
+        <a class="btn btn-primary btn-small" data-invite href="/commands">Add to server</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="app" tabindex="-1">
+    <noscript>
+      <div class="container page">
+        <h1>Risk</h1>
+        <p class="lede">This site needs JavaScript to show the command list and live status. Type !commands in your Discord server to see everything Risk can do.</p>
+      </div>
+    </noscript>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>Risk isn't affiliated with Discord Inc.</p>
+      <nav aria-label="Footer">
+        <a href="/commands" data-link>Commands</a>
+        <a href="/terms" data-link>Terms</a>
+      </nav>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="/assets/js/app.js"></script>
+</body>
+</html>

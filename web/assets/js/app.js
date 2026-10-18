@@ -1,4 +1,5 @@
 import { api } from "./api.js";
+import { initMotionFlag, prefersReduced } from "./anim.js";
 import { h, mount } from "./dom.js";
 import { renderCommands } from "./commands.js";
 import { renderHome } from "./home.js";
@@ -35,12 +36,18 @@ function render() {
             cleanup = home.cleanup;
             break;
         }
-        case "/commands":
-            node = renderCommands();
+        case "/commands": {
+            const view = renderCommands();
+            node = view.node;
+            cleanup = view.cleanup;
             break;
-        case "/terms":
-            node = renderTerms();
+        }
+        case "/terms": {
+            const view = renderTerms();
+            node = view.node;
+            cleanup = view.cleanup;
             break;
+        }
         default:
             node = notFound();
     }
@@ -63,13 +70,20 @@ function render() {
     }
     firstRender = false;
 }
+function transition(update) {
+    const doc = document;
+    if (doc.startViewTransition && !prefersReduced())
+        doc.startViewTransition(update);
+    else
+        update();
+}
 function navigate(url) {
     if (url.pathname + url.search === window.location.pathname + window.location.search) {
-        render();
+        transition(render);
         return;
     }
     window.history.pushState({}, "", url.pathname + url.search);
-    render();
+    transition(render);
 }
 document.addEventListener("click", (event) => {
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
@@ -83,8 +97,20 @@ document.addEventListener("click", (event) => {
     event.preventDefault();
     navigate(url);
 });
-window.addEventListener("popstate", render);
+window.addEventListener("popstate", () => transition(render));
+function watchHeader() {
+    const header = document.querySelector(".site-header");
+    if (!header || !("IntersectionObserver" in window))
+        return;
+    const sentinel = document.createElement("div");
+    sentinel.setAttribute("aria-hidden", "true");
+    sentinel.style.cssText = "position:absolute;top:0;left:0;width:1px;height:24px;pointer-events:none";
+    document.body.prepend(sentinel);
+    new IntersectionObserver(([entry]) => header.classList.toggle("is-stuck", !!entry && !entry.isIntersecting)).observe(sentinel);
+}
 async function start() {
+    initMotionFlag();
+    watchHeader();
     try {
         config = await api.config();
     }

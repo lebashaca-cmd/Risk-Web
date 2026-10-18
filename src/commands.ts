@@ -1,6 +1,6 @@
 import { api } from "./api.js";
-import { h, mount } from "./dom.js";
-import { copyWithToast } from "./ui.js";
+import { h, mount, type Child } from "./dom.js";
+import { copyWithToast, flashCopied } from "./ui.js";
 import type { CommandInfo, CommandsPayload } from "./types.js";
 
 function usageLines(command: CommandInfo, prefix: string): string[] {
@@ -19,30 +19,51 @@ function matches(command: CommandInfo, query: string): boolean {
     .every((word) => haystack.includes(word));
 }
 
-export function renderCommands(): HTMLElement {
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function highlight(text: string, query: string): Child[] {
+  const words = query.split(/\s+/).filter(Boolean).map(escapeRegExp);
+  if (!words.length) return [text];
+  const parts = text.split(new RegExp(`(${words.join("|")})`, "ig"));
+  return parts.map((part, i) => (i % 2 === 1 ? h("mark", {}, part) : part));
+}
+
+export function renderCommands(): { node: HTMLElement; cleanup: () => void } {
   const node = h("div", { class: "view container page" });
   const body = h("div", { class: "commands-body" }, h("p", { class: "muted" }, "Loading commands"));
   node.append(h("h1", {}, "Commands"), body);
+
+  const onKey = (event: KeyboardEvent) => {
+    if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) return;
+    const active = document.activeElement;
+    if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
+    const search = document.getElementById("command-search");
+    if (!search) return;
+    event.preventDefault();
+    search.focus();
+  };
+  document.addEventListener("keydown", onKey);
 
   api
     .commands()
     .then((data) => build(body, data))
     .catch(() => {
-      mount(
-        body,
-        h("p", { class: "empty" }, "The command list didn't load. Refresh the page, or type !commands in your server."),
-      );
+      mount(body, h("p", { class: "empty" }, "The command list didn't load. Refresh the page, or type !commands in your server."));
     });
 
-  return node;
+  return { node, cleanup: () => document.removeEventListener("keydown", onKey) };
 }
 
 function build(body: HTMLElement, data: CommandsPayload): void {
   let query = "";
   let category = "All";
   let prefix = data.prefixes[0] ?? "!";
+  let animateNext = true;
 
   const categories = ["All", ...Array.from(new Set(data.commands.map((c) => c.category)))];
+  const countOf = (name: string) => (name === "All" ? data.commands.length : data.commands.filter((c) => c.category === name).length);
 
   const search = h("input", {
     class: "search",
@@ -58,7 +79,12 @@ function build(body: HTMLElement, data: CommandsPayload): void {
   });
 
   const chipButtons = categories.map((name) =>
-    h("button", { class: "chip", type: "button", "aria-pressed": String(name === category), onclick: () => setCategory(name) }, name),
+    h(
+      "button",
+      { class: "chip", type: "button", "aria-pressed": String(name === category), onclick: () => setCategory(name) },
+      name,
+      h("span", { class: "count" }, String(countOf(name))),
+    ),
   );
   const prefixButtons = data.prefixes.map((p) =>
     h("button", { class: "chip chip-mono", type: "button", "aria-pressed": String(p === prefix), onclick: () => setPrefix(p) }, p),
@@ -69,6 +95,7 @@ function build(body: HTMLElement, data: CommandsPayload): void {
 
   function setCategory(name: string): void {
     category = name;
+    animateNext = true;
     chipButtons.forEach((button, i) => button.setAttribute("aria-pressed", String(categories[i] === name)));
     renderList();
   }
@@ -82,6 +109,8 @@ function build(body: HTMLElement, data: CommandsPayload): void {
   function renderList(): void {
     const visible = data.commands.filter((c) => (category === "All" || c.category === category) && matches(c, query));
     summary.textContent = `${visible.length} ${visible.length === 1 ? "command" : "commands"}`;
+    list.classList.toggle("stagger", animateNext);
+    animateNext = false;
 
     if (!visible.length) {
       mount(
@@ -111,6 +140,7 @@ function build(body: HTMLElement, data: CommandsPayload): void {
     const groups = new Map<string, CommandInfo[]>();
     for (const command of visible) groups.set(command.category, [...(groups.get(command.category) ?? []), command]);
 
+    let index = 0;
     mount(
       list,
       ...Array.from(groups, ([name, commands]) =>
@@ -121,35 +151,40 @@ function build(body: HTMLElement, data: CommandsPayload): void {
           h(
             "ul",
             { class: "command-list" },
-            ...commands.map((command) =>
-              h(
+            ...commands.map((command) => {
+              const order = Math.min(index++, 14);
+              return h(
                 "li",
-                { class: "command" },
+                { class: "command", style: `--i:${order}` },
                 h(
                   "div",
                   { class: "command-use" },
-                  ...usageLines(command, prefix).map((line) =>
-                    h(
+                  ...usageLines(command, prefix).map((line) => {
+                    const button = h(
                       "button",
                       {
                         class: "usage",
                         type: "button",
                         title: "Copy this command",
                         "aria-label": `Copy ${line}`,
-                        onclick: () => void copyWithToast(line),
+                        onclick: () => {
+                          flashCopied(button);
+                          void copyWithToast(line);
+                        },
                       },
-                      h("code", {}, line),
-                    ),
-                  ),
+                      h("code", {}, ...highlight(line, query)),
+                    );
+                    return button;
+                  }),
                 ),
                 h(
                   "div",
                   { class: "command-info" },
-                  h("p", {}, command.description || "No description yet."),
+                  h("p", {}, ...highlight(command.description || "No description yet.", query)),
                   command.permission ? h("p", { class: "perm" }, `Needs ${command.permission}`) : null,
                 ),
-              ),
-            ),
+              );
+            }),
           ),
         ),
       ),
@@ -161,8 +196,13 @@ function build(body: HTMLElement, data: CommandsPayload): void {
     h(
       "div",
       { class: "controls" },
-      h("label", { class: "sr-only", for: "command-search" }, "Search commands"),
-      search,
+      h(
+        "div",
+        { class: "search-wrap" },
+        h("label", { class: "sr-only", for: "command-search" }, "Search commands"),
+        search,
+        h("kbd", { class: "kbd", "aria-hidden": "true" }, "/"),
+      ),
       h("div", { class: "chip-row", role: "group", "aria-label": "Category" }, ...chipButtons),
       data.prefixes.length > 1
         ? h("div", { class: "chip-row", role: "group", "aria-label": "Prefix" }, h("span", { class: "chip-label" }, "Prefix"), ...prefixButtons)

@@ -35,3 +35,7 @@ export async function copyText(text) {
 export async function copyWithToast(text) {
     toast((await copyText(text)) ? "Copied to clipboard" : "Couldn't copy. Select the text and copy it yourself.");
 }
+export function flashCopied(button) {
+    button.classList.add("copied");
+    window.setTimeout(() => button.classList.remove("copied"), 1100);
+}
