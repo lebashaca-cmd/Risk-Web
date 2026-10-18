@@ -1,0 +1,241 @@
+{
+  "generatedAt": "2026-10-18T17:40:46+00:00",
+  "prefixes": [
+    "!",
+    "?",
+    ","
+  ],
+  "commands": [
+    {
+      "name": "bio",
+      "kind": "prefix",
+      "category": "Info",
+      "description": "Displays information from your Risk Bio website.",
+      "examples": [
+        ""
+      ],
+      "permission": null
+    },
+    {
+      "name": "commands",
+      "kind": "prefix",
+      "category": "Info",
+      "description": "Shows all commands and what they do.",
+      "examples": [
+        ""
+      ],
+      "permission": null
+    },
+    {
+      "name": "ping",
+      "kind": "prefix",
+      "category": "Info",
+      "description": "Check the bot's latency.",
+      "examples": [],
+      "permission": null
+    },
+    {
+      "name": "serverinfo",
+      "kind": "prefix",
+      "category": "Info",
+      "description": "Shows information about the server.",
+      "examples": [],
+      "permission": null
+    },
+    {
+      "name": "tos",
+      "kind": "prefix",
+      "category": "Info",
+      "description": "Shows the server Terms of Service.",
+      "examples": [
+        ""
+      ],
+      "permission": null
+    },
+    {
+      "name": "userinfo",
+      "kind": "prefix",
+      "category": "Info",
+      "description": "Shows information about a user.",
+      "examples": [
+        "@user"
+      ],
+      "permission": null
+    },
+    {
+      "name": "ban",
+      "kind": "prefix",
+      "category": "Moderation",
+      "description": "Bans a member from the server.",
+      "examples": [
+        "@user reason"
+      ],
+      "permission": "Ban Members"
+    },
+    {
+      "name": "clear",
+      "kind": "prefix",
+      "category": "Moderation",
+      "description": "Deletes a specified number of messages.",
+      "examples": [
+        "10"
+      ],
+      "permission": "Manage Messages"
+    },
+    {
+      "name": "kick",
+      "kind": "prefix",
+      "category": "Moderation",
+      "description": "Kicks a member from the server.",
+      "examples": [
+        "@user reason"
+      ],
+      "permission": "Kick Members"
+    },
+    {
+      "name": "unban",
+      "kind": "prefix",
+      "category": "Moderation",
+      "description": "Unbans a user by their ID.",
+      "examples": [
+        "123456789"
+      ],
+      "permission": "Ban Members"
+    },
+    {
+      "name": "ticket",
+      "kind": "prefix",
+      "category": "Tickets",
+      "description": "Posts the ticket panel.",
+      "examples": [
+        "\"category_id\" @staff"
+      ],
+      "permission": "Manage Channels"
+    },
+    {
+      "name": "ticketlogs",
+      "kind": "prefix",
+      "category": "Tickets",
+      "description": "Sets the log channel for tickets.",
+      "examples": [
+        "#channel"
+      ],
+      "permission": "Manage Server"
+    },
+    {
+      "name": "logs",
+      "kind": "prefix",
+      "category": "Server logs",
+      "description": "Sets the server log channel (deletes, edits, voice, roles).",
+      "examples": [
+        "#channel"
+      ],
+      "permission": "Manage Server"
+    },
+    {
+      "name": "welcome",
+      "kind": "prefix",
+      "category": "Welcome",
+      "description": "Set the welcome message. 'New_user' is replaced with a mention of the member who joins.",
+      "examples": [
+        "123456789 Welcome New_user to Risk"
+      ],
+      "permission": "Manage Server"
+    },
+    {
+      "name": "ask",
+      "kind": "prefix",
+      "category": "AI",
+      "description": "Ask the AI a question. Code comes in code blocks, files get attached.",
+      "examples": [
+        "your question"
+      ],
+      "permission": null
+    },
+    {
+      "name": "github",
+      "kind": "prefix",
+      "category": "Lookups",
+      "description": "Shows a GitHub profile or repo.",
+      "examples": [
+        "username",
+        "owner/repo"
+      ],
+      "permission": null
+    },
+    {
+      "name": "spotify",
+      "kind": "prefix",
+      "category": "Lookups",
+      "description": "Searches Spotify or shows a link.",
+      "examples": [
+        "song name",
+        "<spotify link>"
+      ],
+      "permission": null
+    },
+    {
+      "name": "tiktok",
+      "kind": "prefix",
+      "category": "Lookups",
+      "description": "Shows a TikTok profile.",
+      "examples": [
+        "username"
+      ],
+      "permission": null
+    },
+    {
+      "name": "youtube",
+      "kind": "prefix",
+      "category": "Lookups",
+      "description": "Shows a YouTube video, channel or playlist, or searches.",
+      "examples": [
+        "@channel",
+        "<link>",
+        "search words"
+      ],
+      "permission": null
+    }
+  ],
+  "tos": {
+    "sections": [
+      {
+        "title": "1. Acceptance",
+        "text": "By joining or using this server, its bot, or its tickets, you agree to these terms. If you don't agree, please leave the server."
+      },
+      {
+        "title": "2. Discord Rules",
+        "text": "You must follow Discord's Terms of Service and Community Guidelines at all times. You must be at least 13 years old, or the minimum age required in your country."
+      },
+      {
+        "title": "3. Respect Everyone",
+        "text": "No harassment, bullying, hate speech, discrimination, threats, or doxxing. Disagreements are fine, personal attacks are not."
+      },
+      {
+        "title": "4. Content",
+        "text": "No NSFW, gore, or illegal content. No malware, token loggers, scams, phishing links, or pirated material."
+      },
+      {
+        "title": "5. Spam & Advertising",
+        "text": "No spam, mass pings, or flooding. No advertising, self-promotion, or server invites (including by DM) without staff permission."
+      },
+      {
+        "title": "6. Bot Usage",
+        "text": "Don't abuse, exploit, or try to crash the bot. AI answers can be wrong, so don't rely on them for anything important, and don't use the bot to produce harmful content."
+      },
+      {
+        "title": "7. Tickets & Logs",
+        "text": "Tickets are private between you and staff. Staff can read them, and a transcript is saved to a staff-only log channel when a ticket closes. Don't open tickets to troll or spam."
+      },
+      {
+        "title": "8. Moderation",
+        "text": "Staff may warn, mute, kick, or ban at their discretion. Staff decisions are final, but you can appeal through a ticket. Using alt accounts to evade a ban results in a permanent ban."
+      },
+      {
+        "title": "9. Changes",
+        "text": "These terms may change at any time without notice. Continuing to use the server means you accept the current version."
+      }
+    ],
+    "updated": "October 10, 2026"
+  }
+}
